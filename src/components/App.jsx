@@ -15,7 +15,7 @@ class App extends Component {
     return (
       <div>
         <ToastContainer autoClose={3000}/>
-        <Searchbar onSubmit={this.handleFormSubmit} />
+        <Searchbar onSubmit={this.handleFormSubmit}/>
         
       </div>
     );
