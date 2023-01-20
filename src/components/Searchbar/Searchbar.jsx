@@ -25,7 +25,6 @@ class Searchbar extends Component {
             toast.error('Please enter a valid value')
             return
         }
-            toast.success('Great')
         this.props.onSubmit(this.state.query)
         this.setState({query: ''})
 

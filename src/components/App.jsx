@@ -1,10 +1,11 @@
 import { Component } from 'react';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import Searchbar from './Searchbar';
 import fetchImages from 'services/api';
 import ImageGallery from './ImageGallery';
 import { Container } from './App.styled';
 import Button from './Button';
+import Loader from './Loader';
 // import Modal from './Modal';
 
 class App extends Component {
@@ -13,31 +14,48 @@ class App extends Component {
     largeImageURL: null,
     page: 1,
     images: [],
+    isloading: false,
+    error: null,
+  };
+
+  loadNextPage = async () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { query, page } = this.state;
+    const { query, page, images } = this.state;
     if (
       prevState.query !== this.state.query ||
       prevState.page !== this.state.page
     ) {
-      const { hits } = await fetchImages(query, page);
-      this.setState({ images: [...prevState.images, ...hits] });
+      try {
+        this.setState({ isloading: true, error: null });
+        const response = await fetchImages(query, page);
+        this.setState(({ images: [...images, ...response.hits] }));
+      } catch (error) {
+        this.setState({
+          error: toast.error('Something wrong, please try again'),
+        });
+      } finally {
+        this.setState({ isloading: false });
+      }
     }
   }
-  
-// fetchImages(this.state.query, this.state.page).then(data => this.setState())
-  handleFormSubmit = query => {
-    this.setState({ query: query});
+
+  handleFormSubmit = async query => {
+    this.setState({ query: query, page: 1, images: [] });
   };
 
   render() {
+    const { isloading } = this.state;
     return (
       <Container>
-        <ToastContainer autoClose={3000}/>
+        <ToastContainer autoClose={3000} />
         <Searchbar onSubmit={this.handleFormSubmit} />
+
         <ImageGallery images={this.state.images} />
-        <Button />
+        {isloading && <Loader/>}
+        <Button onLoadMore={this.loadNextPage} />
         {/* <Modal/> */}
       </Container>
     );
