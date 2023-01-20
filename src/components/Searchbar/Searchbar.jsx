@@ -41,7 +41,7 @@ class Searchbar extends Component {
 
           <SearchInput
             onChange={this.handleChange}
-            class="input"
+            
                     type="text"
                     value={this.state.query}
             autoComplete="off"
