@@ -11,9 +11,9 @@ import Loader from './Loader';
 class App extends Component {
   state = {
     query: '',
-    largeImageURL: null,
     page: 1,
     images: [],
+    totalImages: 0,
     isloading: false,
     error: null,
   };
@@ -23,15 +23,15 @@ class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    const { query, page, images } = this.state;
+    const { query, page, images, totalImages } = this.state;
     if (
       prevState.query !== this.state.query ||
       prevState.page !== this.state.page
     ) {
       try {
         this.setState({ isloading: true, error: null });
-        const response = await fetchImages(query, page);
-        this.setState(({ images: [...images, ...response.hits] }));
+        const response = await fetchImages(query, page, totalImages);
+        this.setState(({ images: page===1? [...response.hits]:[...images, ...response.hits], totalImages: response.totalHits }));
       } catch (error) {
         this.setState({
           error: toast.error('Something wrong, please try again'),
@@ -42,20 +42,21 @@ class App extends Component {
     }
   }
 
-  handleFormSubmit = async query => {
+  handleFormSubmit = query => {
     this.setState({ query: query, page: 1, images: [] });
   };
 
   render() {
-    const { isloading } = this.state;
+    const { isloading,  images, totalImages} = this.state;
     return (
       <Container>
         <ToastContainer autoClose={3000} />
         <Searchbar onSubmit={this.handleFormSubmit} />
 
         <ImageGallery images={this.state.images} />
-        {isloading && <Loader/>}
-        <Button onLoadMore={this.loadNextPage} />
+        {isloading && <Loader />}
+        {images.length !== 0 && images.length<totalImages && <Button onLoadMore={this.loadNextPage} />}
+        
         {/* <Modal/> */}
       </Container>
     );
