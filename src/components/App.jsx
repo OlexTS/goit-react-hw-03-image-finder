@@ -53,8 +53,8 @@ class App extends Component {
         <Searchbar onSubmit={this.handleFormSubmit} />
 
         <ImageGallery images={this.state.images} />
-        {isloading && <Loader />}
-        {images.length !== 0 && images.length<totalImages && <Button onLoadMore={this.loadNextPage} />}
+        
+        {isloading ? <Loader /> : images.length !== 0 && images.length<totalImages && <Button onLoadMore={this.loadNextPage} />}
         
         </Container>
     );

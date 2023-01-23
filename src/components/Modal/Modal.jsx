@@ -1,5 +1,9 @@
 import { Component } from "react";
+import { createPortal } from "react-dom";
 import { ModalWindow, Overlay} from "./Modal.styled";
+
+const modalRef = document.querySelector('#modal-root')
+
 
 class Modal extends Component {
 
@@ -18,11 +22,11 @@ class Modal extends Component {
   }
     render() {
     const { largeImageURL, onClose, tags} = this.props
-    return <Overlay onClick={onClose}>
+    return createPortal(<Overlay onClick={onClose}>
   <ModalWindow >
     <img src={largeImageURL} alt={tags} />
   </ModalWindow>
-</Overlay>}
+</Overlay>, modalRef)}
     
 }
 
