@@ -1,8 +1,14 @@
+import PropTypes from 'prop-types';
 import Modal from 'components/Modal';
 import { Component } from 'react';
 import { Item, Image } from './ImageGalleryItem.styled';
 
 class ImageGalleryItem extends Component {
+  static propTypes = {
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+  };
   state = {
     isModalOpen: false,
   };
@@ -17,11 +23,16 @@ class ImageGalleryItem extends Component {
     return (
       <>
         <Item onClick={this.handleToggleModal}>
-        <Image src={webformatURL} alt={tags} />
-        
-        </Item>{(isModalOpen) && <Modal largeImageURL={largeImageURL} onClose={this.handleToggleModal} tags={tags} />}</>
-      
-      
+          <Image src={webformatURL} alt={tags} />
+        </Item>
+        {isModalOpen && (
+          <Modal
+            largeImageURL={largeImageURL}
+            onClose={this.handleToggleModal}
+            tags={tags}
+          />
+        )}
+      </>
     );
   }
 }

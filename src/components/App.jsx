@@ -17,46 +17,78 @@ class App extends Component {
     error: null,
   };
 
-  loadNextPage = async () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
+  async componentDidUpdate(_, prevState) {
+    const { query, page } = this.state;
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { query, page, images, totalImages } = this.state;
     if (
       prevState.query !== this.state.query ||
       prevState.page !== this.state.page
     ) {
-      try {
-        this.setState({ isloading: true, error: null });
-        const response = await fetchImages(query, page, totalImages);
-        this.setState(({ images: page===1? [...response.hits]:[...images, ...response.hits], totalImages: response.totalHits }));
-      } catch (error) {
-        this.setState({
-          error: toast.error('Something wrong, please try again'),
-        });
-      } finally {
-        this.setState({ isloading: false });
-      }
+      this.setState({ isloading: true, error: null });
+      fetchImages(query, page)
+        .then(response => {
+          if (!response.totalHits) {
+            return toast.error('Bad query! Please try again.');
+          }
+          this.setState(({ images }) => ({
+            images:
+              page === 1 ? [...response.hits] : [...images, ...response.hits],
+            totalImages: response.totalHits,
+          }));
+        })
+        .catch(error =>
+          this.setState({
+            error: toast.error('Something was wrong, please try again.'),
+          })
+        )
+        .finally(() => this.setState({ isloading: false }));
     }
   }
+
+  //An example of using async/await
+
+  // handlefetchImages = async (query, page, totalImages) => {
+  //   try {
+  //     const response = await fetchImages(query, page, totalImages);
+  //     this.setState(({images}) => ({
+  //       images: page === 1 ? [...response.hits] : [...images, ...response.hits],
+  //       totalImages: response.totalHits,
+  //     }));
+  //   } catch (error) {
+  //     this.setState({
+  //       error: toast.error('Something wrong, please try again'),
+  //     });
+  //   } finally {
+  //     this.setState({ isloading: false });
+  //   }
+  // };
+
+  loadNextPage = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
 
   handleFormSubmit = query => {
     this.setState({ query: query, page: 1, images: [] });
   };
 
+  renderButtonOrLoader = () => {
+    const { isloading, images, totalImages } = this.state;
+    return isloading ? (
+      <Loader />
+    ) : (
+      images.length !== 0 && images.length < totalImages && (
+        <Button onLoadMore={this.loadNextPage} />
+      )
+    );
+  };
   render() {
-    const { isloading,  images, totalImages} = this.state;
     return (
       <Container>
         <ToastContainer autoClose={3000} />
         <Searchbar onSubmit={this.handleFormSubmit} />
-
         <ImageGallery images={this.state.images} />
-        
-        {isloading ? <Loader /> : images.length !== 0 && images.length<totalImages && <Button onLoadMore={this.loadNextPage} />}
-        
-        </Container>
+        {this.renderButtonOrLoader()}
+      </Container>
     );
   }
 }

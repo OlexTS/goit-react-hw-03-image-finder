@@ -15,7 +15,7 @@ const Searchbar = ({ onSubmit }) => {
     const { value } = event.currentTarget.elements.query;
     event.preventDefault();
     if (value.trim() === '') {
-      toast.error('Please enter a valid value');
+      toast.error('Please enter a valid query');
       return;
     }
     onSubmit(value);
