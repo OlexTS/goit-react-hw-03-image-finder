@@ -1,11 +1,29 @@
+import { Component } from "react";
 import { ModalWindow, Overlay} from "./Modal.styled";
 
-const Modal = () => {
-    return <Overlay >
+class Modal extends Component {
+
+  componentDidMount() {
+  window.addEventListener('keydown', this.onCloseByEscape)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onCloseByEscape)
+  }
+
+  onCloseByEscape = (event) => {
+    if (event.code === 'Escape') {
+      this.props.onClose()
+    }
+  }
+    render() {
+    const { largeImageURL, onClose, tags} = this.props
+    return <Overlay onClick={onClose}>
   <ModalWindow >
-    <img src="" alt="" />
+    <img src={largeImageURL} alt={tags} />
   </ModalWindow>
-</Overlay>
+</Overlay>}
+    
 }
 
 export default Modal;

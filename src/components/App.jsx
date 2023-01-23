@@ -6,7 +6,6 @@ import ImageGallery from './ImageGallery';
 import { Container } from './App.styled';
 import Button from './Button';
 import Loader from './Loader';
-// import Modal from './Modal';
 
 class App extends Component {
   state = {
@@ -57,8 +56,7 @@ class App extends Component {
         {isloading && <Loader />}
         {images.length !== 0 && images.length<totalImages && <Button onLoadMore={this.loadNextPage} />}
         
-        {/* <Modal/> */}
-      </Container>
+        </Container>
     );
   }
 }
